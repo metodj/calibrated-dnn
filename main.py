@@ -24,8 +24,10 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 
 args = arg_parser.parse_args()
 
-if args.gpu:
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
+print(args)
+# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+# if args.gpu:
+#     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 
 args.grFactor = list(map(int, args.grFactor.split('-')))
 args.bnFactor = list(map(int, args.bnFactor.split('-')))
@@ -75,6 +77,16 @@ def main():
         
         
     model = getattr(models, args.arch)(args)
+    if torch.cuda.is_available():
+        # Print the total number of GPUs available
+        print("Number of GPUs available:", torch.cuda.device_count())
+        
+        # List each GPU
+        for i in range(torch.cuda.device_count()):
+            print(f"GPU {i}: {torch.cuda.get_device_name(i)}, Compute Capability: {torch.cuda.get_device_capability(i)}")
+    else:
+        print("CUDA is not available. Check your installation and environment.")
+    # assert torch.cuda.device_count() == 2
     model = torch.nn.DataParallel(model).cuda()
 
     criterion = nn.CrossEntropyLoss().cuda()

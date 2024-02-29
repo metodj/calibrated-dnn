@@ -230,10 +230,13 @@ def dynamic_evaluate(model, test_loader, val_loader, args, prints = False):
 
         val_pred, val_target, var0 = tester.calc_la_logit(val_loader, args.var0)
         test_pred, test_target, var0 = tester.calc_la_logit(test_loader, args.var0)
+        torch.save(test_pred, os.path.join(args.save, 'la_logits.pth'))
+        torch.save(test_target, os.path.join(args.save, 'targets.pth'))
       
     if args.MIE:
         val_pred = calc_ensemble_logits(val_pred, flop_weights)
-        test_pred = calc_ensemble_logits(test_pred, flop_weights)          
+        test_pred = calc_ensemble_logits(test_pred, flop_weights)  
+        torch.save(test_pred, os.path.join(args.save, 'mie_la_logits.pth'))      
                 
     # Calculate validation and test set accuracies for each block
     _, argmax_val = val_pred.max(dim=2, keepdim=False) #predicted class confidences
